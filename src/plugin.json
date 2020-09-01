@@ -4,7 +4,7 @@
   "id": "inter-cloud-intercloud-grafana-datasource",
   "metrics": true,
   "info": {
-    "description": "Datasource plugin for IntreCloud's services metrics",
+    "description": "Datasource plugin for InterCloud's services metrics",
     "author": {
       "name": "Jean-Thierry BONHOMME",
       "url": "https://www.intercloud.com"
@@ -25,11 +25,11 @@
     "links": [
       {
         "name": "Website",
-        "url": "https://github.com/grafana/simple-datasource"
+        "url": "https://github.com/intercloud/intercloud-grafana-plugin"
       },
       {
         "name": "License",
-        "url": "https://github.com/grafana/simple-datasource/blob/master/LICENSE"
+        "url": "https://github.com/intercloud/intercloud-grafana-plugin/blob/master/LICENSE"
       }
     ],
     "screenshots": [],
