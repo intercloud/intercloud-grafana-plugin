@@ -1,20 +1,19 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 export interface MyQuery extends DataQuery {
-  queryText?: string;
-  constant: number;
+  irn?: string;
+  metrics: string;
 }
 
 export const defaultQuery: Partial<MyQuery> = {
-  constant: 6.5,
+  irn: 'irn:connector:aaaa:csp:bbbb',
+  metrics: 'latency',
 };
 
 /**
  * These are options configured for each DataSource instance
  */
-export interface MyDataSourceOptions extends DataSourceJsonData {
-  path?: string;
-}
+export interface MyDataSourceOptions extends DataSourceJsonData {}
 
 /**
  * Value that is used in the backend, but never sent over HTTP to the frontend

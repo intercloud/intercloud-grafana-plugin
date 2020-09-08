@@ -15,8 +15,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   settings?: DataSourceInstanceSettings;
   type?: string;
   url?: string;
-  //name?: string;
-  path?: string;
   q?: any;
   backendSrv?: any;
   templateSrv?: any;
@@ -35,14 +33,11 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     this.settings = instanceSettings;
     this.type = instanceSettings.type;
     this.url = instanceSettings.url;
-    //this.url = 'https://api-console-dev.intercloud.io';
-    //this.name = instanceSettings.name;
     this.q = $q;
     this.backendSrv = backendSrv;
     this.templateSrv = templateSrv;
     this.withCredentials = instanceSettings.withCredentials;
     this.jsonData = instanceSettings.jsonData;
-    this.path = instanceSettings.jsonData.path;
     this.headers = { 'Content-Type': 'application/json' };
     if (typeof instanceSettings.basicAuth === 'string' && instanceSettings.basicAuth.length > 0) {
       this.headers['Authorization'] = instanceSettings.basicAuth;
@@ -57,15 +52,27 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const to = range!.to.valueOf();
 
     console.log(options);
+    console.log(this.jsonData);
 
     // Return a constant for each query.
     const data = options.targets.map(target => {
       const query = defaults(target, defaultQuery);
+      console.log(query.irn);
+      console.log(query.metrics);
+      //this.doRequest(`/metrics/query/irn/irn:connectors:skstok62tbks::p0q4dy/bits_send/run?start-d=2020-07-27T11:27:44%2B02:00&end-d=XX`).then((res: { status: number; body: string }) =>
+      this.doRequest(`/metrics/query/irn/${query.irn}/${query.metrics}/run`).then(
+        (res: { status: number; body: any }) => {
+          console.log(res.body);
+          res.status === 200
+            ? { status: 'success', message: 'OK', title: 'Success' }
+            : { status: 'error', message: res.body, title: 'Error' };
+        }
+      );
       return new MutableDataFrame({
         refId: query.refId,
         fields: [
           { name: 'Time', values: [from, to], type: FieldType.time },
-          { name: 'Value', values: [query.constant, query.constant], type: FieldType.number },
+          { name: 'Value', values: [query.irn, query.metrics], type: FieldType.number },
         ],
       });
     });
@@ -76,13 +83,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   async testDatasource() {
     // Implement a health check for your data source.
     // todo query /metrics/healthcheck
-    console.log('testDatasource: ' + this.url + '/health/metrics');
-    console.log(this.q);
-    console.log(this.withCredentials);
-    console.log(this.basicAuth);
-    console.log(this.headers);
-    console.log(this.path);
-    console.log(this.jsonData);
     return this.doRequest('/health/metrics').then((res: { status: number; body: string }) =>
       res.status === 200
         ? { status: 'success', message: 'OK', title: 'Success' }

@@ -11,38 +11,41 @@ const { FormField } = LegacyForms;
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
 export class QueryEditor extends PureComponent<Props> {
-  onQueryTextChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { onChange, query } = this.props;
-    onChange({ ...query, queryText: event.target.value });
+  onIrnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { onChange, query, onRunQuery } = this.props;
+    onChange({ ...query, irn: event.target.value });
+    // executes the query
+    onRunQuery();
   };
 
-  onConstantChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onMetricsChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onChange, query, onRunQuery } = this.props;
-    onChange({ ...query, constant: parseFloat(event.target.value) });
+    onChange({ ...query, metrics: event.target.value });
     // executes the query
     onRunQuery();
   };
 
   render() {
     const query = defaults(this.props.query, defaultQuery);
-    const { queryText, constant } = query;
+    const { metrics, irn } = query;
 
     return (
       <div className="gf-form">
         <FormField
           width={4}
-          value={constant}
-          onChange={this.onConstantChange}
-          label="Constant"
-          type="number"
-          step="0.1"
+          value={irn || ''}
+          onChange={this.onIrnChange}
+          label="IRN"
+          type="string"
+          tooltip="Intercloud resource name"
         />
         <FormField
           labelWidth={8}
-          value={queryText || ''}
-          onChange={this.onQueryTextChange}
-          label="Query Text"
-          tooltip="Not used yet"
+          value={metrics || ''}
+          onChange={this.onMetricsChange}
+          label="Metrics Name"
+          type="string"
+          tooltip="Metrics name"
         />
       </div>
     );
