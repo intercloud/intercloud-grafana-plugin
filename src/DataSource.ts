@@ -48,36 +48,45 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     const { range } = options;
-    const from = range!.from.valueOf();
-    const to = range!.to.valueOf();
+    const from = new Date(range!.from.valueOf());
+    const to = new Date(range!.to.valueOf());
 
-    console.log(options);
-    console.log(this.jsonData);
-
-    // Return a constant for each query.
-    const data = options.targets.map(target => {
+    console.log('1');
+    // For each query...
+    const promises = options.targets.map(target => {
       const query = defaults(target, defaultQuery);
-      console.log(query.irn);
-      console.log(query.metrics);
-      //this.doRequest(`/metrics/query/irn/irn:connectors:skstok62tbks::p0q4dy/bits_send/run?start-d=2020-07-27T11:27:44%2B02:00&end-d=XX`).then((res: { status: number; body: string }) =>
-      this.doRequest(`/metrics/query/irn/${query.irn}/${query.metrics}/run`).then(
-        (res: { status: number; body: any }) => {
-          console.log(res.body);
-          res.status === 200
-            ? { status: 'success', message: 'OK', title: 'Success' }
-            : { status: 'error', message: res.body, title: 'Error' };
+      const uri = `/metrics/query/irn/${query.irn}/${
+        query.metrics
+      }/run?start-d=${from.toISOString()}&end-d=${to.toISOString()}`;
+
+      console.log('2');
+      this.doRequest(uri).then((res: any) => {
+        console.log('3');
+        const frame = new MutableDataFrame({
+          refId: query.refId,
+          fields: [
+            { name: 'time', type: FieldType.time },
+            { name: 'value', type: FieldType.number },
+          ],
+        });
+        console.log(res);
+        if (res.status === 200) {
+          const values = res.data.Results[0].Series[0].values;
+          values.forEach((point: any) => {
+            const d = new Date(point[0]);
+            frame.add({ time: d.getTime(), value: point[1] });
+            //frame.appendRow([d.getTime(), point[1]]);
+          });
+        } else {
+          console.log('error ' + res.body);
         }
-      );
-      return new MutableDataFrame({
-        refId: query.refId,
-        fields: [
-          { name: 'Time', values: [from, to], type: FieldType.time },
-          { name: 'Value', values: [query.irn, query.metrics], type: FieldType.number },
-        ],
+        console.log('RETURN FROM REQUEST');
+        console.log(frame);
+        return frame;
       });
     });
 
-    return { data };
+    return Promise.all(promises).then(data => ({ data }));
   }
 
   async testDatasource() {
@@ -97,8 +106,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       headers: this.headers,
       method: 'GET',
     };
-    console.log(options);
-
+    console.log('2.5');
     return this.backendSrv.datasourceRequest(options);
   }
 }
