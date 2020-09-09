@@ -4,12 +4,12 @@ This plugin provides a Grafana Data Source to show InterCloud's services metrics
 
 ## Quick Test
 
-1. Environment and tools
+### 1. Environment and tools
 
 You need a node engine version ">=12 <13". You can use [nvm](https://github.com/nvm-sh/nvm) to manage different version.
 You also will need [yarn](https://yarnpkg.com/) to build the plugin.
 
-2. Run a local grafana with InterCloud's plugin
+### 2. Run a local grafana with InterCloud's plugin
 
 ```BASH
 mkdir grafana-plugins
@@ -26,7 +26,7 @@ Add the InterCloud Data Source (See https://grafana.com/docs/grafana/latest/feat
 
 Press `Save & Test` button.
 
-3. Create panel
+### 3. Create panel
 
 Go to `+ > Create > Dashboard` and Add a new panel.
 Fill the query information with the [IRN](https://doc.intercloud.io/api-howtos/metrics/) of the service you want to retrieve metrics (e.g. `irn:connectors:skstok62tbks::p0q4dy`) and the metrics name (e.g. `bits_received`)
@@ -35,12 +35,15 @@ You can add more than one query per panel (e.g. `bits_send` and `bits_received`)
 
 You can find a list of available metrics per service in the [InterCloud documentation](https://doc.intercloud.io/api-howtos/metrics/).
 
-## Getting started
-1. Install dependencies
+## Getting started with development for the plugin
+
+### 1. Install dependencies
+
 ```BASH
 yarn install
 ```
-2. Build plugin in development mode or run in watch mode
+
+### 2. Build plugin in development mode or run in watch mode
 ```BASH
 yarn dev
 ```
@@ -48,7 +51,8 @@ or
 ```BASH
 yarn watch
 ```
-3. Build plugin in production mode
+
+### 3. Build plugin in production mode
 ```BASH
 yarn build
 ```
