@@ -67,7 +67,18 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
           const values = res.data.Results[0].Series[0].values;
           values.forEach((point: any) => {
             const d = new Date(point[0]);
-            frame.appendRow([d.getTime(), point[1]]);
+            switch (query.metrics) {
+              case 'bits_send':
+              case 'bits_received':
+              case 'latency':
+              case 'packet_loss':
+              case 'jitter':
+                frame.appendRow([d.getTime(), point[1]]);
+                break;
+              case 'connStatusHistory':
+                frame.appendRow([d.getTime(), (point[1] / (point[1] + point[2])) * 100]);
+                break;
+            }
           });
         } else {
           throw new Error('An error occurred: ' + res.body);
