@@ -1,4 +1,4 @@
-# INterCloud Grafana Data Source Plugin
+# InterCloud Grafana Data Source Plugin
 
 This plugin provides a Grafana Data Source to show InterCloud's services metrics from the REST API.
 
