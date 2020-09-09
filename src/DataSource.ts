@@ -7,8 +7,8 @@ import {
   FieldType,
 } from '@grafana/data';
 
-import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
-import defaults from 'lodash/defaults';
+import { MyQuery, MyDataSourceOptions /*, defaultQuery*/ } from './types';
+//import defaults from 'lodash/defaults';
 
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   settings?: DataSourceInstanceSettings;
@@ -46,13 +46,12 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
-    /*const { range } = options;
+    const { range } = options;
     const from = new Date(range!.from.valueOf());
     const to = new Date(range!.to.valueOf());
 
     console.log('1');
 
-    
     // For each query...
     const promises = options.targets.map(query => {
       const uri = `/metrics/query/irn/${query.irn}/${
@@ -60,7 +59,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }/run?start-d=${from.toISOString()}&end-d=${to.toISOString()}`;
 
       console.log('2');
-      this.doRequest(uri).then((res: any) => {
+      return this.doRequest(uri).then((res: any) => {
         console.log('3');
         const frame = new MutableDataFrame({
           refId: query.refId,
@@ -69,7 +68,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             { name: 'value', type: FieldType.number },
           ],
         });
-        console.log(res);
         if (res.status === 200) {
           const values = res.data.Results[0].Series[0].values;
           values.forEach((point: any) => {
@@ -80,14 +78,19 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         } else {
           console.log('error ' + res.body);
         }
-        console.log('RETURN FROM REQUEST');
+        console.log('RETURN FROM MAP');
         console.log(frame);
         return frame;
       });
     });
 
-    return Promise.all(promises).then(data => ({ data }));
-    */
+    return Promise.all(promises).then(data => {
+      console.log('RETURN FROM PROMISES');
+      console.log(data);
+      return { data };
+    });
+
+    /*
     const { range } = options;
     const from = range!.from.valueOf();
     const to = range!.to.valueOf();
@@ -112,11 +115,12 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       console.log('RETURN FROM MAP');
       console.log(frame);
       return frame;
+      
     });
 
     console.log('RETURN FROM QUERY');
     console.log(data);
-    return { data };
+    return { data };*/
   }
 
   async testDatasource() {
@@ -137,6 +141,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       method: 'GET',
     };
     console.log('2.5');
-    return this.backendSrv.datasourceRequest(options);
+    //return this.backendSrv.datasourceRequest(options);
+    const result = await this.backendSrv.datasourceRequest(options);
+    return result;
   }
 }
