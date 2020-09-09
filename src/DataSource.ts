@@ -60,7 +60,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
           refId: query.refId,
           fields: [
             { name: 'time', type: FieldType.time },
-            { name: 'bitrate_inout', type: FieldType.number },
+            { name: res.data.measure, type: FieldType.number },
           ],
         });
         if (res.status === 200) {
