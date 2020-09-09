@@ -70,7 +70,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             frame.appendRow([d.getTime(), point[1]]);
           });
         } else {
-          console.log('error ' + res.body);
+          throw new Error('An error occurred: ' + res.body);
         }
         return frame;
       });
