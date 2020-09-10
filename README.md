@@ -35,6 +35,18 @@ You can add more than one query per panel (e.g. `bits_send` and `bits_received`)
 
 You can find a list of available metrics per service in the [InterCloud documentation](https://doc.intercloud.io/api-howtos/metrics/).
 
+## Metrics types currently supported
+
+### Connectors
+* `bits_send`
+* `bits_received`
+* `connStatusHistory`
+
+### Links
+* `latency`
+* `packet_loss`
+* `jitter`
+
 ## Getting started with development for the plugin
 
 ### 1. Install dependencies
@@ -60,6 +72,9 @@ yarn build
 ## Todo
 
 * Signature verification
+* Support status measures
+* Add alerting support (backend plugin)
+* Add annotations support
 
 ## Learn more
 - [InterCloud Portal and API Documentation](https://doc.intercloud.io)
