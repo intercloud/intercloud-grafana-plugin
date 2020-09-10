@@ -35,6 +35,8 @@ You can add more than one query per panel (e.g. `bits_send` and `bits_received`)
 
 You can find a list of available metrics per service in the [InterCloud documentation](https://doc.intercloud.io/api-howtos/metrics/).
 
+![](assets/panel.png)
+
 ## Metrics types currently supported
 
 ### Connectors
