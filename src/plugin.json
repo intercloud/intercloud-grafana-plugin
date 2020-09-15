@@ -3,11 +3,14 @@
   "name": "intercloud-grafana-datasource",
   "id": "intercloud-grafana-datasource",
   "metrics": true,
+  "backend": true,
+  "executable": "gpx_intercloud-grafana-plugin",
+  "alerting": true,
   "info": {
     "description": "Datasource plugin for InterCloud's services metrics",
     "author": {
       "name": "Jean-Thierry BONHOMME",
-      "url": "https://www.intercloud.com"
+      "url": "https://console.intercloud.io"
     },
     "keywords": [
       "intercloud",
@@ -37,7 +40,7 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaVersion": "6.5.x",
+    "grafanaVersion": "7.x.x",
     "plugins": []
   },
   "routes": [

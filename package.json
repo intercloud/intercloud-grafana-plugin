@@ -1,7 +1,7 @@
 {
   "name": "intercloud-grafana-datasource",
   "version": "1.0.0",
-  "description": "Datasource plugin for InterCloud's services metrics",
+  "description": "This plugin provides a Grafana Data Source to show InterCloud's services metrics from the REST API.",
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
@@ -13,6 +13,7 @@
   "devDependencies": {
     "@grafana/data": "7.0.1",
     "@grafana/toolkit": "7.0.1",
+    "@grafana/runtime": "7.0.1",
     "@grafana/ui": "7.0.1",
     "@types/lodash": "latest",
     "@testing-library/jest-dom": "5.4.0",

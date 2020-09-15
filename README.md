@@ -7,15 +7,31 @@ This plugin provides a Grafana Data Source to show InterCloud's services metrics
 ### 1. Environment and tools
 
 You need a node engine version ">=12 <13". You can use [nvm](https://github.com/nvm-sh/nvm) to manage different version.
-You also will need [yarn](https://yarnpkg.com/) to build the plugin.
+You also will need [yarn](https://yarnpkg.com/) to build the data source plugin.
+Then, you will need [mage](https://magefile.org/) to build the backend plugin.
 
-### 2. Run a local grafana with InterCloud's plugin
+To install and build the plugin:
 
 ```BASH
 mkdir grafana-plugins
 cd grafana-plugins
 git clone https://github.com/intercloud/intercloud-grafana-plugin.git
-docker run -d -p 3000:3000 -v <path_to_grafana-plugins_directory>:/var/lib/grafana/plugins --name=grafana grafana/grafana:7.0.0
+cd intercloud-grafana-plugin
+yarn install
+yarn build
+mage -v
+```
+
+### 2. Run a local grafana with InterCloud's plugin
+
+This commands will execute plugin without signature for development purpose.
+.
+```BASH
+mkdir grafana-plugins
+cd grafana-plugins
+git clone https://github.com/intercloud/intercloud-grafana-plugin.git
+docker run -d -p 3000:3000 -v <path_to_grafana-plugins_directory>:/var/lib/grafana/plugins \
+    -e "GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=intercloud-grafana-datasource" --name=grafana grafana/grafana:7.0.0
 ```
 
 Then open your browser on http://localhost:3000 (use admin/admin as default credentials, you can change it after login).
