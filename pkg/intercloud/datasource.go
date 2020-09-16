@@ -85,9 +85,29 @@ type queryModel struct {
 	Datasource    string `json:"datasource"`
 }
 
+type queryResult struct {
+	Type    string `json:"type"`
+	Measure string `json:"measure"`
+	Axis    struct {
+		NonNegativeDerivative struct {
+			Unit  string `json:"unit"`
+			Title string `json:"title"`
+		} `json:"non_negative_derivative"`
+	} `json:"axis"`
+	Results []struct {
+		Series []struct {
+			Name    string          `json:"name"`
+			Columns []string        `json:"columns"`
+			Values  [][]interface{} `json:"values"`
+		} `json:"Series"`
+		Messages interface{} `json:"Messages"`
+	} `json:"Results"`
+}
+
 func (md *MetricsDatasource) query(ctx context.Context, query backend.DataQuery, uri, token string) (backend.DataResponse, error) { //nolint
 	// Unmarshal the json into our queryModel
 	var qm queryModel
+	var qr queryResult
 	var err error
 	var response backend.DataResponse
 
@@ -101,6 +121,11 @@ func (md *MetricsDatasource) query(ctx context.Context, query backend.DataQuery,
 	err = json.Unmarshal(query.JSON, &qm)
 	if err != nil {
 		return response, err
+	}
+
+	// Log a warning if `Format` is empty.
+	if qm.Format == "" {
+		log.DefaultLogger.Warn("format is empty. defaulting to time series")
 	}
 
 	from := timeRange.From.UTC().Format(time.RFC3339)
@@ -133,36 +158,40 @@ func (md *MetricsDatasource) query(ctx context.Context, query backend.DataQuery,
 		return response, err
 	}
 
-	response.Error = json.Unmarshal(query.JSON, &qm)
-	if response.Error != nil {
+	// decode result from API
+	err = json.NewDecoder(res.Body).Decode(&qr)
+	if err != nil {
 		return response, err
-	}
-
-	// Log a warning if `Format` is empty.
-	if qm.Format == "" {
-		log.DefaultLogger.Warn("format is empty. defaulting to time series")
 	}
 
 	// create data frame response
 	frame := data.NewFrame("response")
 
-	var metricsValues []int64
 	var metricsTimestamps []time.Time
+	var metricsValues []float64
 
-	const values = res.data.Results[0].Series[0].values
+	values := qr.Results[0].Series[0].Values
 	for _, point := range values {
-		metricsTimestamps = append(values, time.Parse(point[0]))
+		ts, err := time.Parse(time.RFC3339, point[0].(string))
+		if err != nil {
+			log.DefaultLogger.Error("unable to parse time " + point[0].(string) + " : " + err.Error())
+		}
+		metricsTimestamps = append(metricsTimestamps, ts)
 		switch qm.Metrics {
 		case "bits_send":
+			metricsValues = append(metricsValues, point[1].(float64))
 		case "bits_received":
+			metricsValues = append(metricsValues, point[1].(float64))
 		case "latency":
+			metricsValues = append(metricsValues, point[1].(float64))
 		case "packet_loss":
+			metricsValues = append(metricsValues, point[1].(float64))
 		case "jitter":
-			metricsValues = append(values, point[1])
-			break
+			metricsValues = append(metricsValues, point[1].(float64))
 		case "connStatusHistory":
-			metricsValues = append(values, (point[1]/(point[1]+point[2]))*100)
-			break
+			nbPointsOK := point[1].(float64)
+			nbPointsKO := point[2].(float64)
+			metricsValues = append(metricsValues, (nbPointsOK/(nbPointsOK+nbPointsKO))*100)
 		}
 	}
 
