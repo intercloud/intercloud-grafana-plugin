@@ -42,27 +42,5 @@
   "dependencies": {
     "grafanaVersion": "7.x.x",
     "plugins": []
-  },
-  "routes": [
-    {
-      "path": "health/metrics",
-      "url": "https://api-console-staging.intercloud.io/health/metrics",
-      "headers": [
-        {
-          "name": "Authorization",
-          "content": "Bearer {{ .SecureJsonData.apiKey }}"
-        }
-      ]  
-    },
-    {
-      "path": "metrics/query/irn",
-      "url": "https://api-console-staging.intercloud.io/metrics/query/irn",
-      "headers": [
-        {
-          "name": "Authorization",
-          "content": "Bearer {{ .SecureJsonData.apiKey }}"
-        }
-      ]  
-    }
-  ]
+  }
 }

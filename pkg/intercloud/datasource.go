@@ -4,12 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
@@ -48,13 +46,25 @@ func NewMetricsDatasource() datasource.ServeOpts {
 // contains Frames ([]*Frame).
 func (md *MetricsDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	log.DefaultLogger.Info("QueryData", "request", req)
+	var err error
 
 	// create response struct
 	response := backend.NewQueryDataResponse()
 
+	s, err := md.getInstance(req.PluginContext)
+	if err != nil {
+		return response, err
+	}
+
+	log.DefaultLogger.Info("query", "uri", s.uri)
+
 	// loop over queries and execute them individually.
 	for _, q := range req.Queries {
-		res := md.query(ctx, q)
+		res, err := md.query(ctx, q, s.uri, s.token)
+		if err != nil {
+			log.DefaultLogger.Error("QueryData", "error", err.Error())
+			continue
+		}
 
 		// save the response in a hashmap
 		// based on with RefID as identifier
@@ -65,18 +75,67 @@ func (md *MetricsDatasource) QueryData(ctx context.Context, req *backend.QueryDa
 }
 
 type queryModel struct {
-	Format string `json:"format"`
+	Format        string `json:"format"`
+	Metrics       string `json:"metrics"`
+	IRN           string `json:"irn"`
+	OrgID         uint32 `json:"orgId"`
+	RefID         string `json:"refId"`
+	MaxDataPoints uint32 `json:"maxDataPoints"`
+	DatasourceID  uint32 `json:"datasourceId"`
+	Datasource    string `json:"datasource"`
 }
 
-func (md *MetricsDatasource) query(ctx context.Context, query backend.DataQuery) backend.DataResponse { //nolint
+func (md *MetricsDatasource) query(ctx context.Context, query backend.DataQuery, uri, token string) (backend.DataResponse, error) { //nolint
 	// Unmarshal the json into our queryModel
 	var qm queryModel
+	var err error
+	var response backend.DataResponse
 
-	response := backend.DataResponse{}
+	timeRange := query.TimeRange
+	intervale := query.Interval
+
+	log.DefaultLogger.Info("query", "query", query)
+	log.DefaultLogger.Info("query", "timeRange", timeRange)
+	log.DefaultLogger.Info("query", "intervale", intervale)
+
+	err = json.Unmarshal(query.JSON, &qm)
+	if err != nil {
+		return response, err
+	}
+
+	from := timeRange.From.UTC().Format(time.RFC3339)
+	to := timeRange.To.UTC().Format(time.RFC3339)
+	endpoint := fmt.Sprintf("%s/metrics/query/irn/%s/%s/run?start-d=%s&end-d=%s", uri, qm.IRN, qm.Metrics, from, to)
+	log.DefaultLogger.Info("query", "url", endpoint)
+
+	requestURL, err := url.Parse(endpoint)
+	if err != nil {
+		return response, err
+	}
+
+	req := &http.Request{
+		Method: "GET",
+		URL:    requestURL,
+		Header: map[string][]string{
+			"Authorization": {"Bearer " + token},
+		},
+	}
+
+	httpClient := &http.Client{}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return response, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return response, err
+	}
 
 	response.Error = json.Unmarshal(query.JSON, &qm)
 	if response.Error != nil {
-		return response
+		return response, err
 	}
 
 	// Log a warning if `Format` is empty.
@@ -100,7 +159,7 @@ func (md *MetricsDatasource) query(ctx context.Context, query backend.DataQuery)
 	// add the frames to the response
 	response.Frames = append(response.Frames, frame)
 
-	return response
+	return response, nil
 }
 
 func (md *MetricsDatasource) getInstance(ctx backend.PluginContext) (*instanceSettings, error) {
@@ -108,7 +167,6 @@ func (md *MetricsDatasource) getInstance(ctx backend.PluginContext) (*instanceSe
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("--------- getInstance: %+v\n", s)
 	return s.(*instanceSettings), nil
 }
 
@@ -127,10 +185,8 @@ func (md *MetricsDatasource) CheckHealth(ctx context.Context, chReq *backend.Che
 			Message: "parse url error",
 		}, err
 	}
-	str := fmt.Sprintf("--------- CheckHealth: %+v\n", s)
 
 	// todo get url from grafana from config editor (like token)
-	log.DefaultLogger.Info(str)
 	requestURL, err := url.Parse(s.uri + "/health/metrics")
 	if err != nil {
 		return &backend.CheckHealthResult{
@@ -146,7 +202,6 @@ func (md *MetricsDatasource) CheckHealth(ctx context.Context, chReq *backend.Che
 			"Authorization": {"Bearer " + s.token},
 		},
 	}
-	log.DefaultLogger.Info("** req ** " + req.URL.String())
 
 	httpClient := &http.Client{}
 
@@ -158,14 +213,6 @@ func (md *MetricsDatasource) CheckHealth(ctx context.Context, chReq *backend.Che
 		}, err
 	}
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return &backend.CheckHealthResult{
-			Status:  backend.HealthStatusError,
-			Message: "error parsing body",
-		}, err
-	}
-	log.DefaultLogger.Info("** res ** " + res.Status + " - " + string(body))
 
 	if res.StatusCode != 200 {
 		return &backend.CheckHealthResult{
@@ -180,30 +227,10 @@ func (md *MetricsDatasource) CheckHealth(ctx context.Context, chReq *backend.Che
 	}, nil
 }
 
-/*
-func makeHTTPRequest(ctx context.Context, httpClient *http.Client, req *http.Request) ([]byte, error) {
-	res, err := ctxhttp.Do(ctx, httpClient, req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return body, fmt.Errorf("error status: %v", res.Status)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-	return body, nil
-}
-*/
 type instanceSettings struct {
 	token          string
 	cachingEnabled bool
 	uri            string
-	client         *resty.Client
 }
 
 func newDataSourceInstance(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) { //nolint
@@ -216,7 +243,6 @@ func newDataSourceInstance(settings backend.DataSourceInstanceSettings) (instanc
 		cachingEnabled: datasourceSettings.CachingEnabled,
 		token:          datasourceSettings.APIKey,
 		uri:            datasourceSettings.URI,
-		client:         datasourceSettings.Client,
 	}, nil
 }
 
