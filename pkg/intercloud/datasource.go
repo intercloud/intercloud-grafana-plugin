@@ -146,14 +146,33 @@ func (md *MetricsDatasource) query(ctx context.Context, query backend.DataQuery,
 	// create data frame response
 	frame := data.NewFrame("response")
 
+	var metricsValues []int64
+	var metricsTimestamps []time.Time
+
+	const values = res.data.Results[0].Series[0].values
+	for _, point := range values {
+		metricsTimestamps = append(values, time.Parse(point[0]))
+		switch qm.Metrics {
+		case "bits_send":
+		case "bits_received":
+		case "latency":
+		case "packet_loss":
+		case "jitter":
+			metricsValues = append(values, point[1])
+			break
+		case "connStatusHistory":
+			metricsValues = append(values, (point[1]/(point[1]+point[2]))*100)
+			break
+		}
+	}
+
 	// add the time dimension
 	frame.Fields = append(frame.Fields,
-		data.NewField("time", nil, []time.Time{query.TimeRange.From, query.TimeRange.To}),
+		data.NewField("time", nil, metricsTimestamps),
 	)
-
 	// add values
 	frame.Fields = append(frame.Fields,
-		data.NewField("values", nil, []int64{10, 20}),
+		data.NewField("values", nil, metricsValues),
 	)
 
 	// add the frames to the response
