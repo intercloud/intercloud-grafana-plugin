@@ -7,12 +7,34 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
+
+// Settings represents the Datasource options in Grafana
+type Settings struct {
+	APIKey         string `json:"apiKey"`
+	CachingEnabled bool   `json:"cachingEnabled"`
+}
+
+// LoadSettings converts the DataSourceInLoadSettings to usable Github settings
+func LoadSettings(settings backend.DataSourceInstanceSettings) (Settings, error) {
+	s := Settings{}
+	if err := json.Unmarshal(settings.JSONData, &s); err != nil {
+		return Settings{}, err
+	}
+
+	if val, ok := settings.DecryptedSecureJSONData["apiKey"]; ok {
+		s.APIKey = val
+	}
+	log.DefaultLogger.Info("** LoadSettings ** " + s.APIKey)
+
+	return s, nil
+}
 
 // newDatasource returns datasource.ServeOpts.
 func newDatasource() datasource.ServeOpts {
@@ -46,6 +68,7 @@ type SampleDatasource struct {
 // contains Frames ([]*Frame).
 func (td *SampleDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	log.DefaultLogger.Info("** QueryData **", "request", req)
+	spew.Dump(req)
 
 	// create response struct
 	response := backend.NewQueryDataResponse()
@@ -70,6 +93,7 @@ func (td *SampleDatasource) query(ctx context.Context, query backend.DataQuery) 
 	// Unmarshal the json into our queryModel
 	var qm queryModel
 	log.DefaultLogger.Info("** query **", query.JSON)
+	log.DefaultLogger.Info("** query ** " + token)
 
 	response := backend.DataResponse{}
 
@@ -109,7 +133,7 @@ func (td *SampleDatasource) query(ctx context.Context, query backend.DataQuery) 
 func (td *SampleDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	var status = backend.HealthStatusOk
 	var message = "Data source is working"
-	log.DefaultLogger.Info("** CheckHealth **")
+	log.DefaultLogger.Info("** CheckHealth ** " + token)
 
 	if rand.Int()%2 == 0 {
 		status = backend.HealthStatusError
@@ -126,13 +150,26 @@ type instanceSettings struct {
 	httpClient *http.Client
 }
 
-func newDataSourceInstance(setting backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+var token string
+
+func newDataSourceInstance(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+	log.DefaultLogger.Info("** newDataSourceInstance **")
+	datasourceSettings, err := LoadSettings(settings)
+	if err != nil {
+		return nil, err
+	}
+
+	datasourceSettings.CachingEnabled = true
+	token = datasourceSettings.APIKey
+
 	return &instanceSettings{
 		httpClient: &http.Client{},
 	}, nil
+
 }
 
 func (s *instanceSettings) Dispose() {
 	// Called before creatinga a new instance to allow plugin authors
 	// to cleanup.
+	log.DefaultLogger.Info("** Dispose **")
 }

@@ -5,14 +5,14 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+	"github.com/intercloud/intercloud-grafana-plugin/pkg/intercloud"
 )
 
 func main() {
 	// Start listening to requests send from Grafana. This call is blocking so
 	// it wont finish until Grafana shutsdown the process or the plugin choose
 	// to exit close down by itself
-	log.DefaultLogger.Info("** MAIN **")
-	err := datasource.Serve(newDatasource())
+	err := datasource.Serve(intercloud.NewMetricsDatasource())
 
 	// Log any error if we could start the plugin.
 	if err != nil {
