@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
@@ -141,9 +142,9 @@ func (md *MetricsDatasource) CheckHealth(ctx context.Context, chReq *backend.Che
 	req := &http.Request{
 		Method: "GET",
 		URL:    requestURL,
-		/*Header: map[string][]string{
-			"Authorization": {"Bearer " + "xxx"},
-		},*/
+		Header: map[string][]string{
+			"Authorization": {"Bearer " + s.token},
+		},
 	}
 	log.DefaultLogger.Info("** req ** " + req.URL.String())
 
@@ -157,12 +158,19 @@ func (md *MetricsDatasource) CheckHealth(ctx context.Context, chReq *backend.Che
 		}, err
 	}
 	defer res.Body.Close()
-	log.DefaultLogger.Info("** res ** " + res.Status)
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return &backend.CheckHealthResult{
+			Status:  backend.HealthStatusError,
+			Message: "error parsing body",
+		}, err
+	}
+	log.DefaultLogger.Info("** res ** " + res.Status + " - " + string(body))
 
 	if res.StatusCode != 200 {
 		return &backend.CheckHealthResult{
 			Status:  backend.HealthStatusError,
-			Message: "wrong status code: " + res.Status,
+			Message: "error: " + res.Status,
 		}, nil
 	}
 
