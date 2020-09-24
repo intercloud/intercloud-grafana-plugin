@@ -1,0 +1,39 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+{
+  "plugin": "intercloud-grafana-plugin",
+  "version": "0.0.1",
+  "files": {
+    "LICENSE": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "README.md": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "gpx_intercloud-grafana-plugin_darwin_amd64": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "gpx_intercloud-grafana-plugin_linux_amd64": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "gpx_intercloud-grafana-plugin_linux_arm64": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "gpx_intercloud-grafana-plugin_windows_amd64.exe": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "img": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "module.js": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "module.js.LICENSE.txt": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "module.js.map": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+    "plugin.json": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+  },
+  "time": 1600961590000,
+  "keyId": "8600FC84B8C97CA2"
+}
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCAAuFiEEhgD8hLjJfKKJc6k7ZwaUcwoIJN0FAl9svDYQHHRlc3RAZ3Jh
+ZmFuYS5mcgAKCRBnBpRzCggk3WVjEADKZTedNAoK8hbGEa6nqKrqkmTJFvXfukME
+5YUy0ZSpzhYmFnOGZLYHsPuQ3zp/txCOrxr6VyyEf2a7H8vGBo8f9+Yp2mbGU4Ri
+8yhStPAIkpH+15z6Ac2PNj9s9tqM+9+MAcTc5SPPixZXewegYd5ynqrgGXSWBC/E
+HYrH4pVUMQDxy5fqzJy3y5Agf/TyWw/RosAOYZHqqW4cjqFafFkNhb1Emf2y4ziA
+MfPvv00XRaBZue9K0utxtQpY2RyCjKTEFYgZ4kWz74/ICw/XwemtSC/4hWFBFthp
+sP/IZRpeIHittG193bOp/VArq3YpESPJxKU5vELFCyKQ1tgnp6wFWZpXnTE7MdMj
+/aJeMrcYRP/dpdlEX8eR2RnG5QfFa5TUN8K5SCkfdh7MjwsfLHz8jamnxL1S6geB
+jCs9CB1qNSUBbzGzr3hMpyMvitOETT4dexhmbjkhKx6HUB6KjzihjAbfIT4/yeX8
+VSyxfDowmOZOETdLYwmDzlanWLG3i1lpLUua67zq1wwjracMS1oDcYS/70uxq5AI
+n6It4RkkyD6ri1xBy/fbVh3C61YTNA2IGjoB5q/OnLGvAfkdAlaSX9S/ctIz/ODH
+MUdnoqg/6LntzAPKYKXrw4i8ZFnqgCIgK+rNiDUCG7FbItKRYJamHROtc3fzXnYb
+WoGaAcnqGA==
+=2xqZ
+-----END PGP SIGNATURE-----
