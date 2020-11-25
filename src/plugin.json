@@ -1,6 +1,6 @@
 {
   "type": "datasource",
-  "name": "intercloud-grafana-datasource",
+  "name": "Intercloud datasource",
   "id": "intercloud-grafana-datasource",
   "metrics": true,
   "info": {
@@ -9,15 +9,7 @@
       "name": "Jean-Thierry BONHOMME",
       "url": "https://www.intercloud.com"
     },
-    "keywords": [
-      "intercloud",
-      "datasource",
-      "grafana",
-      "plugin",
-      "metrics",
-      "kpis",
-      "data"
-    ],
+    "keywords": ["intercloud", "datasource", "grafana", "plugin", "metrics", "kpis", "data"],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"
@@ -49,7 +41,7 @@
           "name": "Authorization",
           "content": "Bearer {{ .SecureJsonData.apiKey }}"
         }
-      ]  
+      ]
     },
     {
       "path": "metrics/query/irn",
@@ -59,7 +51,7 @@
           "name": "Authorization",
           "content": "Bearer {{ .SecureJsonData.apiKey }}"
         }
-      ]  
+      ]
     }
   ]
 }
