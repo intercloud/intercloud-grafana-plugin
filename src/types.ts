@@ -2,12 +2,12 @@ import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 export interface MyQuery extends DataQuery {
   irn?: string;
-  metrics: string;
+  metric?: string;
 }
 
 export const defaultQuery: Partial<MyQuery> = {
-  irn: 'irn:connector:aaaa:csp:bbbb',
-  metrics: 'latency',
+  irn: '',
+  metric: '',
 };
 
 /**
@@ -21,3 +21,34 @@ export interface MyDataSourceOptions extends DataSourceJsonData {}
 export interface MySecureJsonData {
   apiKey?: string;
 }
+
+/**
+ * Influx response type
+ */
+export type InfluxResponse = {
+  type: 'timeserie' | 'status';
+  measure: string;
+  axis: Record<string, { title: string; unit: string }>;
+  Results: {
+    Series:
+      | {
+          columns: [string, string, string];
+          values: [string, number, number][];
+          name: string;
+        }[]
+      | {
+          columns: [string, string];
+          values: [string, number][];
+          name: string;
+        }[]
+      | null;
+  }[];
+};
+
+/**
+ * Metric type response
+ */
+export type MetricTypeResponse = {
+  name: string;
+  type: 'timeserie' | 'status';
+};
