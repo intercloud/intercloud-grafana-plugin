@@ -15,7 +15,8 @@ You also will need [yarn](https://yarnpkg.com/) to build the plugin.
 mkdir grafana-plugins
 cd grafana-plugins
 git clone https://github.com/intercloud/intercloud-grafana-plugin.git
-docker run -d -p 3000:3000 -v <path_to_grafana-plugins_directory>:/var/lib/grafana/plugins --name=grafana grafana/grafana:7.0.0
+yarn build
+docker run -d -p 3000:3000 -v <path_to_grafana-plugins_directory>/dist:/var/lib/grafana/plugins --name=grafana grafana/grafana:7.3.3
 ```
 
 Then open your browser on http://localhost:3000 (use admin/admin as default credentials, you can change it after login).
@@ -37,18 +38,6 @@ You can find a list of available metrics per service in the [InterCloud document
 
 ![](assets/panel.png)
 
-## Metrics types currently supported
-
-### Connectors
-* `bits_send`
-* `bits_received`
-* `connStatusHistory`
-
-### Links
-* `latency`
-* `packet_loss`
-* `jitter`
-
 ## Getting started with development for the plugin
 
 ### 1. Install dependencies
@@ -58,27 +47,34 @@ yarn install
 ```
 
 ### 2. Build plugin in development mode or run in watch mode
+
 ```BASH
 yarn dev
 ```
+
 or
+
 ```BASH
 yarn watch
 ```
 
 ### 3. Build plugin in production mode
+
 ```BASH
 yarn build
 ```
 
 ## Todo
 
-* Signature verification
-* Support status measures
-* Add alerting support (backend plugin)
-* Add annotations support
+- Signature verification
+- Support status measures
+- Add alerting support (backend plugin)
+- Add annotations support
+- ci/cd
+- unit tests
 
 ## Learn more
+
 - [InterCloud Portal and API Documentation](https://doc.intercloud.io)
 - [Grafana documentation](https://grafana.com/docs/)
 - [Grafana Tutorials](https://grafana.com/tutorials/) - Grafana Tutorials are step-by-step guides that help you make the most of Grafana
