@@ -64,7 +64,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     });
 
     // Wait for all promises to resolve, the return all data
-    return Promise.all(promises).then(data => {
+    return Promise.all(promises).then((data) => {
       return { data };
     });
   }
@@ -80,7 +80,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     );
   }
 
-  async doRequest<T extends Record<string, unknown> | Record<string, unknown>[]>(
+  async doRequest<T extends Record<string, unknown> | Array<Record<string, unknown>>>(
     url: string
   ): Promise<FetchResponse<T>> {
     var options = {
@@ -90,8 +90,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       method: 'GET',
     };
 
-    return await getBackendSrv()
-      .fetch<T>(options)
-      .toPromise();
+    return await getBackendSrv().fetch<T>(options).toPromise();
   }
 }

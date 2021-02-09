@@ -19,7 +19,7 @@ export const QueryEditor: FunctionComponent<Props> = ({
   const { irn, metric, refId } = query;
 
   const [isMetricSelectLoading, setMetricSelectLoading] = useState(false);
-  const [options, setOptions] = useState<SelectableValue<string>[]>([]);
+  const [options, setOptions] = useState<Array<SelectableValue<string>>>([]);
   const [validIrn, setValidIrn] = useState(!!irn || false);
 
   const irnDebounced = useDebounce(irn, 300);
@@ -62,7 +62,7 @@ export const QueryEditor: FunctionComponent<Props> = ({
         }
         setValidIrn(true);
       })
-      .catch(e => {
+      .catch((e) => {
         setValidIrn(false);
         console.log({ e });
         throw e;
@@ -70,7 +70,7 @@ export const QueryEditor: FunctionComponent<Props> = ({
       .finally(() => {
         setMetricSelectLoading(false);
       });
-  }, [irnDebounced, setOptions, setMetricSelectLoading, setValidIrn]);
+  }, [irnDebounced, setOptions, setMetricSelectLoading, setValidIrn, datasourceUrl]);
 
   const selectedValue = useMemo(() => options.find(({ value }) => metric === value), [metric, options]);
 

@@ -29,20 +29,20 @@ export type InfluxResponse = {
   type: 'timeserie' | 'status';
   measure: string;
   axis: Record<string, { title: string; unit: string }>;
-  Results: {
+  Results: Array<{
     Series:
-      | {
+      | Array<{
           columns: [string, string, string];
-          values: [string, number, number][];
+          values: Array<[string, number, number]>;
           name: string;
-        }[]
-      | {
+        }>
+      | Array<{
           columns: [string, string];
-          values: [string, number][];
+          values: Array<[string, number]>;
           name: string;
-        }[]
+        }>
       | null;
-  }[];
+  }>;
 };
 
 /**
