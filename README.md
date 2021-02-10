@@ -16,9 +16,8 @@ You also will need **[yarn](https://yarnpkg.com/)** to build the plugin.
 ### 2. Run a local grafana with InterCloud's plugin
 
 ```BASH
-mkdir grafana-plugins
-cd grafana-plugins
 git clone https://github.com/intercloud/intercloud-grafana-plugin.git
+cd intercloud-grafana-plugin
 yarn install
 yarn build
 docker run -d -p 3000:3000 -v <fullpath_to_grafana_local_repository>/dist:/var/lib/grafana/plugins/intercloud --name=grafana grafana/grafana:7.4.0
