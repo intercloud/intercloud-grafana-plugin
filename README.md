@@ -20,8 +20,20 @@ git clone https://github.com/intercloud/intercloud-grafana-plugin.git
 cd intercloud-grafana-plugin
 yarn install
 yarn build
-docker run -d -p 3000:3000 -v <fullpath_to_grafana_local_repository>/dist:/var/lib/grafana/plugins/intercloud --name=grafana grafana/grafana:7.4.0
 ```
+
+After that, you can start a docker container :
+
+* On Windows
+```BASH
+docker run -d -p 3000:3000 -v %cd%/dist:/var/lib/grafana/plugins/intercloud --name=grafana grafana/grafana:7.4.0
+```
+
+* On Linux
+```BASH
+docker run -d -p 3000:3000 -v `pwd`/dist:/var/lib/grafana/plugins/intercloud --name=grafana grafana/grafana:7.4.0
+```
+
 
 Then open your browser on http://localhost:3000 (use admin/admin as default credentials, you can change it after login).
 
