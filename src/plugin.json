@@ -50,6 +50,10 @@
         {
           "name": "Authorization",
           "content": "Bearer {{ .SecureJsonData.apiKey }}"
+        },
+        {
+          "name": "Intercloud-Scope",
+          "content": "{{ .JsonData.organization.value }}"
         }
       ]
     }
