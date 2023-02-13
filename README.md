@@ -2,7 +2,7 @@
 
 This plugin provides a Grafana Data Source to show InterCloud's services metrics from the REST API.
 
-Grafana server version: > 7.4.0 - < 8.0.0
+Grafana server version: >= 7.4.0 - < 8.0.0
 
 ## Quick Test
 
